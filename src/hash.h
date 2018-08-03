@@ -41,6 +41,61 @@ public:
     }
 };
 
+/** A hasher class for Bitcoin's 256-bit hash (triple SHA-256). */
+class CTripleHash256 {
+private:
+    CHash256 sha;
+public:
+    static const size_t OUTPUT_SIZE = CHash256::OUTPUT_SIZE;
+
+    void Finalize(unsigned char hash[OUTPUT_SIZE])
+    {
+        unsigned char buf [CHash256::OUTPUT_SIZE];
+        sha.Finalize(buf);
+        sha.Reset().Write(buf, CHash256::OUTPUT_SIZE).Finalize(hash);
+    }
+
+    CTripleHash256& Write(const unsigned char* data, size_t len)
+    {
+        sha.Write(data, len);
+        return *this;
+    }
+
+    CTripleHash256& Reset()
+    {
+        sha.Reset();
+        return *this;
+    }
+};
+
+/** A hasher class for Bitcoin's 256-bit hash (quadruple SHA-256). */
+class CQuadrupleHash256
+{
+private:
+    CTripleHash256 sha;
+public:
+    static const size_t OUTPUT_SIZE = CTripleHash256::OUTPUT_SIZE;
+
+    void Finalize(unsigned char hash[OUTPUT_SIZE])
+    {
+        unsigned char buf[CTripleHash256::OUTPUT_SIZE];
+        sha.Finalize(buf);
+        sha.Reset().Write(buf, CTripleHash256::OUTPUT_SIZE).Finalize(hash);
+    }
+
+    CQuadrupleHash256& Write(const unsigned char* data, size_t len)
+    {
+        sha.Write(data, len);
+        return *this;
+    }
+
+    CQuadrupleHash256& Reset()
+    {
+        sha.Reset();
+        return *this;
+    }
+};
+
 /** A hasher class for Bitcoin's 160-bit hash (SHA-256 + RIPEMD-160). */
 class CHash160 {
 private:
@@ -118,6 +173,10 @@ class CHashWriter
 private:
     CHash256 ctx;
 
+    /** New features hashing */
+    CTripleHash256 ctx1; //cryptocurrency
+    CQuadrupleHash256 ctx2;
+
     const int nType;
     const int nVersion;
 public:
@@ -132,9 +191,23 @@ public:
     }
 
     // invalidates the object
-    uint256 GetHash() {
+    uint256 GetHash(int i) {
         uint256 result;
-        ctx.Finalize((unsigned char*)&result);
+
+        /** New features hashing */
+        switch(i)
+        {
+        case 1:
+            ctx1.Finalize((unsigned char*)&result);
+            break;
+        case 2:
+            ctx2.Finalize((unsigned char*)&result);
+            break;
+        default: //double-sha256
+            ctx.Finalize((unsigned char*)&result);
+            break;
+        }
+
         return result;
     }
 
