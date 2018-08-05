@@ -191,7 +191,7 @@ public:
     }
 
     // invalidates the object
-    uint256 GetHash(int i) {
+    uint256 GetHash(int i = 0) {
         uint256 result;
 
         /** New features hashing */
