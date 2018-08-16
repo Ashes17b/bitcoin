@@ -10,7 +10,7 @@
 #include <utilstrencodings.h>
 #include <crypto/common.h>
 
-uint256 CBlockHeader::GetHash() const
+uint256 CBlockHeader::GetHash(int i) const
 {
     return SerializeHash(*this);
 }

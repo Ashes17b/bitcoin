@@ -382,7 +382,7 @@ std::vector<unsigned char> CNetAddr::GetGroup() const
     return vchRet;
 }
 
-uint64_t CNetAddr::GetHash() const
+uint64_t CNetAddr::GetHash(int i) const
 {
     uint256 hash = Hash(&ip[0], &ip[16]);
     uint64_t nRet;

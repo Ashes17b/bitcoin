@@ -313,7 +313,7 @@ public:
         return vin.empty() && vout.empty();
     }
 
-    const uint256& GetHash() const { return hash; }
+    const uint256& GetHash(int i = 0) const { return hash; }
     const uint256& GetWitnessHash() const { return m_witness_hash; };
 
     // Return sum of txouts.
